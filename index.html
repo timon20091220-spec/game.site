@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Space War / Neon Rift</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #050816;
+      color: white;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .box {
+      text-align: center;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      background: rgba(8,14,28,.82);
+      box-shadow: 0 0 32px rgba(103,232,249,.16);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+    }
+    p {
+      opacity: .8;
+      margin: 0 0 18px;
+    }
+    a, button {
+      display: inline-block;
+      margin: 6px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(103,232,249,.55);
+      background: rgba(103,232,249,.18);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    function isPhoneOnly() {
+      var ua = navigator.userAgent || "";
+      var w = window.innerWidth || 0;
+      var h = window.innerHeight || 0;
+      var shortSide = Math.min(w, h);
+      var longSide = Math.max(w, h);
+
+      var isIPhone = /iPhone|iPod/i.test(ua);
+      var isAndroidPhone = /Android/i.test(ua) && /Mobile/i.test(ua);
+
+      // 휴대폰만 mobile_v392로 보냄.
+      // 태블릿이나 큰 화면은 PC 파일로 보냄.
+      var phoneSize = shortSide <= 600 && longSide <= 980;
+
+      if (isIPhone) return true;
+      if (isAndroidPhone && phoneSize) return true;
+      return false;
+    }
+
+    function autoStart() {
+      var target = isPhoneOnly() ? "mobile_v392.html" : "pc_original.html";
+      location.replace(target);
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+      // 0.4초 뒤 자동 이동. 실패하면 아래 버튼으로 직접 들어갈 수 있음.
+      setTimeout(autoStart, 400);
+    });
+  </script>
+</head>
+<body>
+  <div class="box">
+    <h1>Space War</h1>
+    <p>자동으로 기기에 맞는 버전을 여는 중입니다.</p>
+    <a href="pc_original.html">PC 버전 열기</a>
+    <a href="mobile_v392.html">휴대폰 v392 열기</a>
+  </div>
+</body>
+</html>
