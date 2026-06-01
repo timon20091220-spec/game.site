@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Space War Tablet</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      touch-action: none;
+    }
+    #gameFrame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    #tabletJoy {
+      position: fixed;
+      left: 28px;
+      bottom: 28px;
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      border: 2px solid rgba(103,232,249,.45);
+      background: rgba(8,14,28,.34);
+      box-shadow: 0 0 24px rgba(103,232,249,.18), inset 0 0 18px rgba(255,255,255,.06);
+      z-index: 100;
+      pointer-events: auto;
+      touch-action: none;
+    }
+    #tabletKnob {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 58px;
+      height: 58px;
+      margin-left: -29px;
+      margin-top: -29px;
+      border-radius: 50%;
+      background: rgba(103,232,249,.72);
+      border: 2px solid rgba(255,255,255,.55);
+      box-shadow: 0 0 20px rgba(103,232,249,.35);
+      transform: translate(0,0);
+    }
+  </style>
+</head>
+<body>
+  <iframe id="gameFrame" src="pc_tablet_base.html"></iframe>
+  <div id="tabletJoy"><div id="tabletKnob"></div></div>
+
+  <script>
+    (function(){
+      var frame = document.getElementById('gameFrame');
+      var joy = document.getElementById('tabletJoy');
+      var knob = document.getElementById('tabletKnob');
+      var pointerId = null;
+      var centerX = 0;
+      var centerY = 0;
+      var radius = 48;
+      var active = {KeyW:false, KeyA:false, KeyS:false, KeyD:false};
+
+      function targetWindow(){
+        return frame && frame.contentWindow ? frame.contentWindow : window;
+      }
+
+      function fireKey(code, key, down){
+        try {
+          var ev = new KeyboardEvent(down ? 'keydown' : 'keyup', {
+            key: key,
+            code: code,
+            bubbles: true,
+            cancelable: true
+          });
+          targetWindow().dispatchEvent(ev);
+          try { targetWindow().document.dispatchEvent(ev); } catch(_) {}
+        } catch(e) {}
+      }
+
+      function setKey(code, key, down){
+        if(active[code] === down) return;
+        active[code] = down;
+        fireKey(code, key, down);
+      }
+
+      function releaseAll(){
+        setKey('KeyW','w',false);
+        setKey('KeyA','a',false);
+        setKey('KeyS','s',false);
+        setKey('KeyD','d',false);
+      }
+
+      function updateCenter(){
+        var r = joy.getBoundingClientRect();
+        centerX = r.left + r.width / 2;
+        centerY = r.top + r.height / 2;
+        radius = Math.max(42, r.width * 0.36);
+      }
+
+      function move(x, y){
+        var dx = x - centerX;
+        var dy = y - centerY;
+        var len = Math.sqrt(dx*dx + dy*dy) || 1;
+        var clamped = Math.min(radius, len);
+        var nx = dx / len;
+        var ny = dy / len;
+        knob.style.transform = 'translate(' + (nx*clamped) + 'px,' + (ny*clamped) + 'px)';
+
+        var dead = 14;
+        setKey('KeyA','a', dx < -dead);
+        setKey('KeyD','d', dx > dead);
+        setKey('KeyW','w', dy < -dead);
+        setKey('KeyS','s', dy > dead);
+      }
+
+      joy.addEventListener('pointerdown', function(e){
+        pointerId = e.pointerId;
+        try { joy.setPointerCapture(pointerId); } catch(_) {}
+        updateCenter();
+        move(e.clientX, e.clientY);
+        e.preventDefault();
+      }, {passive:false});
+
+      joy.addEventListener('pointermove', function(e){
+        if(pointerId !== e.pointerId) return;
+        move(e.clientX, e.clientY);
+        e.preventDefault();
+      }, {passive:false});
+
+      function end(e){
+        if(pointerId !== null && e && e.pointerId !== pointerId) return;
+        pointerId = null;
+        knob.style.transform = 'translate(0,0)';
+        releaseAll();
+        if(e && e.preventDefault) e.preventDefault();
+      }
+
+      joy.addEventListener('pointerup', end, {passive:false});
+      joy.addEventListener('pointercancel', end, {passive:false});
+      window.addEventListener('blur', releaseAll);
+    })();
+  </script>
+</body>
+</html>
