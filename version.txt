@@ -1,0 +1,7 @@
+Space War / Neon Rift
+Version: v462 force tablet pc kakao
+Base: v461 stable
+Created: 2026-06-02 12:08:11
+
+Purpose:
+- Force tablet devices to PC/tablet mode even inside Kakao in-app browser.
