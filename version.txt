@@ -1,0 +1,11 @@
+Space War / Neon Rift
+Version: v461 stable
+Build type: site upload
+Created: 2026-06-02 12:02:25
+
+Base:
+- v461_mobile_joystick_base_aligned
+
+Notes:
+- Stable basic structure
+- Ready for balance and weapon updates
